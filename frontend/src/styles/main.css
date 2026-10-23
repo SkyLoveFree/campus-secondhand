@@ -1,0 +1,278 @@
+:root {
+  --app-bg: #f5f7fa;
+  --app-text: #303133;
+  --app-muted: #909399;
+  --app-border: #e4e7ed;
+  --app-primary: #409eff;
+  --app-danger: #f56c6c;
+  --app-max-width: 1080px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--app-bg);
+  color: var(--app-text);
+  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+a {
+  color: var(--app-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+#app {
+  min-height: 100vh;
+}
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-main {
+  flex: 1;
+  width: 100%;
+  max-width: var(--app-max-width);
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
+
+/* 顶部导航 */
+.app-header {
+  background: #fff;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.app-header__inner {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  max-width: var(--app-max-width);
+  margin: 0 auto;
+  padding: 0 16px;
+  height: 60px;
+}
+
+.app-header__brand {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.app-header__brand:hover {
+  text-decoration: none;
+}
+
+.app-header__nav {
+  display: flex;
+  gap: 16px;
+}
+
+.app-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
+}
+
+.app-header__link {
+  color: var(--app-text);
+}
+
+.app-header__user {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* 通用页面骨架 */
+.page__head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.page__title {
+  margin: 0;
+  font-size: 22px;
+}
+
+.page__subtitle {
+  margin: 0;
+  color: var(--app-muted);
+}
+
+.page--narrow {
+  max-width: 640px;
+}
+
+/* 列表工具栏 */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.toolbar__search {
+  max-width: 320px;
+}
+
+.toolbar__sort {
+  width: 200px;
+}
+
+/* 商品卡片网格：只展示名称/价格/发布时间 */
+.item-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  min-height: 160px;
+}
+
+.item-grid__empty {
+  grid-column: 1 / -1;
+}
+
+.item-card {
+  display: block;
+  padding: 16px;
+  background: #fff;
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  color: var(--app-text);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.item-card:hover {
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.item-card__name {
+  margin: 0 0 8px;
+  font-size: 16px;
+  word-break: break-all;
+}
+
+.item-card__price {
+  margin: 0 0 8px;
+  color: var(--app-danger);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.item-card__time {
+  margin: 0;
+  color: var(--app-muted);
+  font-size: 12px;
+}
+
+/* 加载失败与空态 */
+.state-block {
+  margin-bottom: 16px;
+}
+
+.state-block__retry {
+  margin-top: 8px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+/* 登录 / 注册 */
+.auth-page {
+  display: flex;
+  justify-content: center;
+  padding-top: 32px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+}
+
+.auth-card__title {
+  margin: 0 0 4px;
+  font-size: 22px;
+}
+
+.auth-card__hint {
+  margin: 0 0 20px;
+  color: var(--app-muted);
+  font-size: 13px;
+}
+
+.auth-card__submit {
+  width: 100%;
+}
+
+.auth-card__footer {
+  margin: 16px 0 0;
+  text-align: center;
+  color: var(--app-muted);
+}
+
+/* 详情页 */
+.detail-card__title {
+  margin: 0 0 8px;
+  font-size: 22px;
+}
+
+.detail-card__price {
+  margin: 0 0 16px;
+  color: var(--app-danger);
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.detail-card__actions {
+  margin-top: 20px;
+}
+
+/* 发布 / 编辑表单 */
+.form-tip {
+  margin-bottom: 16px;
+}
+
+@media (max-width: 640px) {
+  .app-header__inner {
+    height: auto;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px 16px;
+  }
+
+  .app-header__actions {
+    margin-left: 0;
+    flex-wrap: wrap;
+  }
+
+  .page__head {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .toolbar__search,
+  .toolbar__sort {
+    max-width: none;
+    width: 100%;
+  }
+}
