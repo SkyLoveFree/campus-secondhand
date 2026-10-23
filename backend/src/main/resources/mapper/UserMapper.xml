@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 用户表 SQL：全部使用 #{} 参数化；表名加反引号，避免 user 关键字歧义 -->
+<mapper namespace="com.campus.secondhand.mapper.UserMapper">
+
+    <sql id="baseColumns">
+        id, username, password_hash, role, created_at, updated_at
+    </sql>
+
+    <select id="selectByUsername" resultType="com.campus.secondhand.entity.User">
+        SELECT
+        <include refid="baseColumns"/>
+        FROM `user`
+        WHERE username = #{username}
+        LIMIT 1
+    </select>
+
+    <select id="selectById" resultType="com.campus.secondhand.entity.User">
+        SELECT
+        <include refid="baseColumns"/>
+        FROM `user`
+        WHERE id = #{id}
+    </select>
+
+    <select id="countByUsername" resultType="long">
+        SELECT COUNT(*)
+        FROM `user`
+        WHERE username = #{username}
+    </select>
+
+    <insert id="insert" parameterType="com.campus.secondhand.entity.User"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `user` (username, password_hash, role)
+        VALUES (#{username}, #{passwordHash}, #{role})
+    </insert>
+
+</mapper>

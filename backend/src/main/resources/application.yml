@@ -1,0 +1,32 @@
+server:
+  port: 8080
+  servlet:
+    session:
+      # Session 闲置超时 30 分钟（与 docs/architecture.md 一致）
+      timeout: 30m
+      cookie:
+        http-only: true
+        same-site: lax
+        path: /
+
+spring:
+  application:
+    name: campus-secondhand-backend
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: "jdbc:mysql://localhost:3306/campus_secondhand?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai"
+    # 数据库账号密码只从环境变量注入，禁止写入真实密码
+    username: "${DB_USERNAME:root}"
+    password: "${DB_PASSWORD:}"
+  jackson:
+    time-zone: Asia/Shanghai
+    date-format: "yyyy-MM-dd HH:mm:ss"
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    com.campus.secondhand: info

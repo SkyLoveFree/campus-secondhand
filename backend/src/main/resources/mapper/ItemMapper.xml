@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 商品表 SQL：全部使用 #{} 参数化；排序使用 choose 白名单，禁止拼接用户输入 -->
+<mapper namespace="com.campus.secondhand.mapper.ItemMapper">
+
+    <sql id="baseColumns">
+        id, item, item_price, contact_info, user_id, created_at, updated_at
+    </sql>
+
+    <!-- 搜索条件：keyword 由 Service 转义 %/_/\ 后传入，ESCAPE '\\' 保证转义生效 -->
+    <sql id="searchCondition">
+        <if test="keyword != null and keyword != ''">
+            WHERE item LIKE CONCAT('%', #{keyword}, '%') ESCAPE '\\'
+        </if>
+    </sql>
+
+    <select id="selectById" resultType="com.campus.secondhand.entity.Item">
+        SELECT
+        <include refid="baseColumns"/>
+        FROM item
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectList" resultType="com.campus.secondhand.entity.Item">
+        SELECT
+        <include refid="baseColumns"/>
+        FROM item
+        <include refid="searchCondition"/>
+        <choose>
+            <when test="sort == 'price_asc'">ORDER BY item_price ASC, id DESC</when>
+            <when test="sort == 'price_desc'">ORDER BY item_price DESC, id DESC</when>
+            <otherwise>ORDER BY created_at DESC, id DESC</otherwise>
+        </choose>
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countList" resultType="long">
+        SELECT COUNT(*)
+        FROM item
+        <include refid="searchCondition"/>
+    </select>
+
+    <insert id="insert" parameterType="com.campus.secondhand.entity.Item"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO item (item, item_price, contact_info, user_id)
+        VALUES (#{item}, #{itemPrice}, #{contactInfo}, #{userId})
+    </insert>
+
+    <update id="update" parameterType="com.campus.secondhand.entity.Item">
+        UPDATE item
+        SET item = #{item},
+            item_price = #{itemPrice},
+            contact_info = #{contactInfo},
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM item WHERE id = #{id}
+    </delete>
+
+</mapper>
