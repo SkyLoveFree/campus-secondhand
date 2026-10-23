@@ -22,14 +22,14 @@ public interface ItemMapper {
     /**
      * 分页查询商品列表。
      *
-     * @param keyword 已转义的搜索关键词（null 或空串表示不筛选）
-     * @param sort    排序枚举值 price_asc / price_desc，其他值按默认创建时间倒序
-     * @param offset  偏移量 (page - 1) * size
+     * @param keyword 已转义的搜索关键词（null 表示不筛选，Escaped by Service）
+     * @param sort    排序白名单值 price_asc / price_desc（null 表示默认创建时间倒序）
+     * @param offset  偏移量 (page - 1) * size，使用 long 防止超大页码溢出
      * @param size    每页条数（服务层保证 1-50）
      */
     List<Item> selectList(@Param("keyword") String keyword,
                           @Param("sort") String sort,
-                          @Param("offset") int offset,
+                          @Param("offset") long offset,
                           @Param("size") int size);
 
     /**

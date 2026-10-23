@@ -45,13 +45,23 @@ public class GlobalExceptionHandler {
         Map<String, String> fieldErrors = new LinkedHashMap<>();
         for (FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
             // 同一字段可能有多个校验注解，只保留第一条提示，避免前端展示混乱
-            fieldErrors.putIfAbsent(fieldError.getField(), fieldError.getDefaultMessage());
+            fieldErrors.putIfAbsent(fieldError.getField(), resolveFieldErrorMessage(fieldError));
         }
         ErrorCode errorCode = ErrorCode.PARAM_INVALID;
         Map<String, Map<String, String>> data = new LinkedHashMap<>();
         data.put("fieldErrors", fieldErrors);
         Result<Map<String, Map<String, String>>> body = Result.fail(errorCode.getCode(), errorCode.getMessage(), data);
         return ResponseEntity.status(errorCode.getHttpStatus()).body(body);
+    }
+
+    /**
+     * 字段错误提示：查询参数类型转换失败（如 page=abc）时 Spring 默认提示为英文，统一改为中文。
+     */
+    private String resolveFieldErrorMessage(FieldError fieldError) {
+        if (fieldError.isBindingFailure()) {
+            return "参数类型不正确";
+        }
+        return fieldError.getDefaultMessage();
     }
 
     /**
