@@ -82,6 +82,23 @@ DELETE FROM item WHERE id = #{id};
 
 分页 `page≥1`、`1≤size≤50`（默认 1/10）；UPDATE/DELETE 影响行数为 0 时按 404 处理。
 
+## 6.1 EXPLAIN 实机验证记录（C4）
+
+验证环境：MySQL 8.0.46（C 本机，Windows），库 `campus_secondhand`；分别在 5 行种子数据与 10005 行压测数据下执行（压测后已重建干净库，恢复 2 用户 + 5 商品）。验证人：C，日期：2026-10-23。
+
+| 查询 | 5 行 | 10005 行 | 结论 |
+|---|---|---|---|
+| `ORDER BY created_at DESC, id DESC LIMIT 10` | ALL + filesort | `idx_item_created_at`，Backward index scan，rows=10 | 索引生效 |
+| `ORDER BY item_price DESC, id DESC LIMIT 10` | — | `idx_item_price`，Backward index scan，rows=10 | 索引生效 |
+| `ORDER BY item_price ASC, id DESC LIMIT 10` | ALL + filesort | ALL + filesort（FORCE INDEX 与覆盖索引实测均无效） | 已知取舍 |
+| `LIKE '%书%'` + 默认排序 | index 扫描 | 借 `idx_item_created_at` 免 filesort + WHERE 过滤 | 符合预期 |
+| `WHERE username='student'` | const，`uk_user_username`，rows=1 | 同左 | 唯一索引生效 |
+
+说明：
+1. 小数据量（5 行）下优化器选全表扫描属正常行为，不代表索引失效。
+2. 价格升序为混合方向排序（`item_price ASC` + `id DESC`），MySQL 索引无法直接支持；万级数据量下 filesort 为毫秒级（LIMIT 优先队列排序），课程规模可接受，不额外加索引。
+3. 同向全 DESC 排序（默认列表、价格降序）可利用索引反向扫描早退，分页首页仅读取 size 行。
+
 ## 7. 初始化与验证
 执行顺序：`sql/schema.sql`（建库、删表重建）→ `sql/data.sql`（先删后插，可重复执行）。脚本 UTF-8 无 BOM。
 
@@ -116,3 +133,4 @@ mysql -u<user> -p --default-character-set=utf8mb4 < sql\data.sql
 
 ## 11. 变更记录
 2026-10-23：v1.0-draft（C，详细版）→ v1.1 精简版（C，按课程定位压缩文档与脚本注释，表结构/口径不变）；A 已确认按当前方案执行；SQL 于 2026-10-23 实机验证通过（MySQL 8.4.11）。
+2026-10-23：追加 §6.1 EXPLAIN 实机验证记录（C4，C 于本机 MySQL 8.0.46 完成；含 10005 行压测与"混合方向排序不走索引"的取舍说明）。
