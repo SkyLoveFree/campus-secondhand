@@ -19,7 +19,7 @@
 |---|---|---|
 | JDK | 21 | ✅ |
 | 后端 | Spring Boot 3.3.x | 🟡 版本 |
-| 前端 | Vue 3 + Vite + Element Plus | 🟡 |
+| 前端 | Vue 3 + Vite + Element Plus + Pinia | 🟡 版本 |
 | 数据库 | MySQL 8.0.16+（本机 8.4.11） | ✅ |
 | 数据访问 | MyBatis（XML Mapper） | 🟡 |
 | 构建 | Maven（建议提交 Wrapper）+ npm | 🟡 |
@@ -58,6 +58,7 @@ campus-secondhand/
 - Java：包 `com.campus.secondhand`；类 UpperCamelCase（`XxxController`/`XxxService`/`XxxMapper`/`XxxVO`）；方法/变量 lowerCamelCase；常量 UPPER_SNAKE；4 空格；单文件 ≤500 行、单方法 ≤50 行。
 - 实体只映射数据库；对外用 DTO/VO，**不返回 `password_hash`**；日志用 SLF4J，禁止 `System.out.println`，禁止打印密码/哈希。
 - 前端：组件 PascalCase（`ItemList.vue`）；请求统一走 `src/api/`；表单前端先校验，后端仍必须校验。
+- 前端状态用 Pinia 管理登录用户；路由使用 **hash 模式**；列表页搜索/排序/分页同步到 URL query；列表卡片只展示名称/价格/时间，联系方式在详情页展示。
 - API JSON camelCase（`itemPrice`/`contactInfo`/`userId`/`createdAt`）；数据库 snake_case（`item_price`/`contact_info`/`user_id`）。
 - 不提交调试代码、注释掉的大段代码、`target/`、`node_modules/`、`dist/`、密钥。
 

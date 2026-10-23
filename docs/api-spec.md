@@ -28,6 +28,7 @@
 - **分页/搜索/排序**：`page` 默认 1（≥1）、`size` 默认 10（1–50）；`keyword` 可选（trim 后 ≤50，空=全部，LIKE 模糊并转义 `%`/`_`/`\`）；`sort` 可选 `price_asc`/`price_desc`（空=按创建时间倒序 `created_at DESC, id DESC`，同价 `id DESC`）；响应 `{"list":[...],"total":N,"page":P,"size":S}`。
 - **校验与格式**：后端 `@Valid` + Service 二次校验，前端校验只提升体验；字符串 trim 后校验/入库；校验失败不写库；时间 `yyyy-MM-dd HH:mm:ss`（Asia/Shanghai）；金额 JSON number（`DECIMAL(10,2)`，>0 且 ≤999999.99，最多两位小数）；删除/登出成功 `data:null`；写操作 `@Transactional`。
 - **前端封装**：所有请求经 `src/utils/request.js`（axios `baseURL:'/api'`、`withCredentials:true`）；401 清状态跳登录、403 提示无权限、400 展示 `fieldErrors`、500 通用提示；页面只经 `src/api/` 调用。
+- **列表展示约定**：列表卡片只展示 `item`、`itemPrice`、`createdAt`，不渲染 `contactInfo`；联系方式在详情页展示。接口仍返回 `contactInfo`，后端无需改动。
 
 ## 2. 权限与接口总览
 

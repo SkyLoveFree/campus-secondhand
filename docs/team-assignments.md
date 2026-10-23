@@ -32,10 +32,10 @@
 
 | 编号 | 负责人 | 任务 | 交付物 | 前置依赖 | 验收要点（含测试） |
 |---|---|---|---|---|---|
-| B1 | B | 工程初始化与骨架 | `frontend/`：Vue 3 + Vite + Element Plus + 路由 + `/api` 代理 | A2 契约冻结 | `npm install && npm run dev` 启动 5173；代理生效 |
+| B1 | B | 工程初始化与骨架 | `frontend/`：Vue 3 + Vite + Element Plus + Pinia + 路由（hash 模式）+ `/api` 代理 | A2 契约冻结 | `npm install && npm run dev` 启动 5173；代理生效 |
 | B2 | B | 请求层与错误处理 | `utils/request.js`、`api/auth.js`、`api/item.js` | B1、api-spec | 9 个接口封装与契约一致；401/403/400/500 提示；无硬编码地址 |
-| B3 | B | 路由、布局与登录态 | `router/`、`stores/user.js`、`AppHeader.vue` | B1、B2 | 未登录跳登录；刷新经 `/me` 恢复；登出清理状态 |
-| B4 | B | 商品列表页 | `ItemList.vue`、`ItemCard.vue`、`EmptyState.vue` | B2、B3、D3 | 搜索 / 价格排序 / 分页正确；加载、空、错误三态；游客可访问 |
+| B3 | B | 路由、布局与登录态 | `router/`（hash 模式）、`stores/user.js`（Pinia）、`AppHeader.vue` | B1、B2 | 未登录跳登录；刷新经 `/me` 恢复；登出清理状态；hash 路由刷新不 404 |
+| B4 | B | 商品列表页 | `ItemList.vue`、`ItemCard.vue`、`EmptyState.vue` | B2、B3、D3 | 搜索 / 价格排序 / 分页正确且同步 URL query；加载、空、错误三态；游客可访问；卡片只显示名称/价格/时间 |
 | B5 | B | 详情页与删除交互 | `ItemDetail.vue`（含删除二次确认） | B4、D4 | 详情字段与列表一致；404 有提示；删除有确认；权限入口显隐正确 |
 | B6 | B | 登录注册 / 发布编辑 / 构建 | `Login.vue`、`Register.vue`、`ItemForm.vue`；`npm run build` 通过 | B2、B3、D2、D4 | 注册登录可用；发布编辑校验正确；构建成功且可部署 |
 
@@ -44,7 +44,7 @@
 | 编号 | 负责人 | 任务 | 交付物 | 前置依赖 | 验收要点（含测试） |
 |---|---|---|---|---|---|
 | C1 | C | 数据库设计文档 | `database-design.md`：ER、字段、约束、索引、字段映射、查询示例 | A2、A3 | 两表字段与 API 映射一致；约束 / 索引明确；评审通过 |
-| C2 | C | 建表脚本 | `sql/schema.sql` | C1 | 干净 MySQL 可执行两遍（由 A 实机验证）；字符集 / 约束 / 索引与文档一致 |
+| C2 | C | 建表脚本 | `sql/schema.sql` | C1 | 干净 MySQL 可执行两遍（A 已于 2026-10-23 实机验证通过）；字符集 / 约束 / 索引与文档一致 |
 | C3 | C | 种子数据 | `sql/data.sql`（admin / student + 3～5 条商品，BCrypt 哈希） | C2、D 提供哈希 | 可重复执行；无明文密码；测试账号可登录 |
 | C4 | C | 查询 SQL 与索引评审 | `database-design.md` 查询样例 + `EXPLAIN` 记录 | C1、C2 | 列表 / 搜索 / 排序 / 分页 SQL 可用；索引取舍有说明 |
 | C5 | C | Mapper SQL 评审与数据库交付验证 | PR 评审意见、数据库验证记录 | D3 / D4 提交、C2 | 无 `${}` 拼接；字段映射一致；按 README 初始化成功 |
@@ -86,7 +86,7 @@
 | Q3 | A 是否参与具体编码 | A **不写实际代码**，负责评审、整合与验收 | ✅ 已确认 |
 | Q4 | 测试账号（admin / student，测试口令 123456）是否写入 README | 写入 README，注明仅演示环境使用 | ✅ 已确认 |
 
-> 另：SQL 脚本实机验证由 A 负责（M1 出口前执行 `sql/schema.sql` + `sql/data.sql` 并记录），C 协助复核。
+> 另：SQL 脚本已由 A 于 2026-10-23 在 MySQL 8.4.11 实机验证通过（schema/data 可重复执行、约束生效；代理复验一致），C 协助复核。
 
 ---
 > [需求规格](requirements.md) · [系统架构](architecture.md) · [API 契约](api-spec.md) · [数据库设计](database-design.md) · [协作流程](development-workflow.md)

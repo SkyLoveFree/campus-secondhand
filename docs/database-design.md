@@ -94,7 +94,7 @@ mysql -u<user> -p --default-character-set=utf8mb4 < sql\data.sql
 
 验证：`SHOW TABLES;`（2 表）、`SHOW INDEX FROM item;`（4 索引）、`SELECT id, username, role FROM user;`、`SELECT COUNT(*) FROM item;`（5）。重置：`DROP DATABASE campus_secondhand;` 后重跑两个脚本（仅开发/演示环境）。
 
-未实机验证：本机 MySQL 8.4.11 服务在运行，但 root 非免密（ERROR 1045），未执行脚本；按 2026-10-23 决定，由 A 在 M1 出口前实机执行 `sql/schema.sql` + `sql/data.sql` 并记录，C 协助复核。
+实机验证（2026-10-23 通过，MySQL 8.4.11）：`schema.sql` + `data.sql` 连续执行两次均成功，重复执行后 users=2、items=5；表 2 张（InnoDB / utf8mb4_0900_ai_ci）；索引 user=PRIMARY+uk_user_username、item=PRIMARY+idx_item_user_id+idx_item_created_at+idx_item_price；重复用户名（含大小写变体）、价格 0/超上限、非法角色、非法外键均被拒绝，合法插入/删除正常。
 
 ## 8. 测试数据（`sql/data.sql`，仅本地测试，生产禁用）
 
@@ -115,4 +115,4 @@ mysql -u<user> -p --default-character-set=utf8mb4 < sql\data.sql
 - MySQL 下限 8.0.16+（CHECK 生效）；测试账号/口令仅本地使用，按 2026-10-23 确认写入 README 并注明仅演示环境。
 
 ## 11. 变更记录
-2026-10-23：v1.0-draft（C，详细版）→ v1.1 精简版（C，按课程定位压缩文档与脚本注释，表结构/口径不变）；A 已确认按当前方案执行。
+2026-10-23：v1.0-draft（C，详细版）→ v1.1 精简版（C，按课程定位压缩文档与脚本注释，表结构/口径不变）；A 已确认按当前方案执行；SQL 于 2026-10-23 实机验证通过（MySQL 8.4.11）。

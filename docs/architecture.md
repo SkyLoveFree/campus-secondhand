@@ -26,7 +26,7 @@ MySQL 8（:3306，库 campus_secondhand）
 |---|---|---|---|
 | JDK | 21 | ✅ | 本机 Temurin 21 |
 | 后端 | Spring Boot 3.3.x | 🟡 | 具体版本在 `pom.xml` 锁定 |
-| 前端 | Vue 3 + Vite + Element Plus | 🟡 | Node.js 20+ |
+| 前端 | Vue 3 + Vite + Element Plus + Pinia | ✅ | 路由 hash 模式；Node.js 20+ |
 | 数据库 | MySQL 8.0.16+ | ✅ | 本机 8.4.11；CHECK 约束需 8.0.16+ |
 | 数据访问 | MyBatis（XML Mapper） | 🟡 | 不用 JPA |
 | 构建 | Maven（建议 Maven Wrapper）+ npm | 🟡 | Windows 开发 |
@@ -48,7 +48,7 @@ MySQL 8（:3306，库 campus_secondhand）
 
 - 模块：auth（注册/登录/登出/me/拦截器）、item（商品 CRUD/搜索/排序/分页）、common（Result/ErrorCode/异常/配置）。
 - 依赖方向：item 依赖 auth 提供的当前用户，反向不依赖；模块间以 Service 接口协作。
-- 前端：`views` → `components` → `api/` → `utils/request.js`；页面不直接拼后端 URL。
+- 前端：`views` → `components` → `api/` → `utils/request.js`；状态用 Pinia（user/列表参数）；路由 hash 模式；页面不直接拼后端 URL。
 
 ## 4. 请求处理链路
 
@@ -81,6 +81,7 @@ MySQL 8（:3306，库 campus_secondhand）
 - 分页 `page`/`size`（默认 1/10，上限 50）；搜索 `keyword`；排序 `price_asc`/`price_desc`，默认创建时间倒序。
 - 时间 `yyyy-MM-dd HH:mm:ss`（Asia/Shanghai）；金额 JSON number，数据库 `DECIMAL(10,2)`。
 - 开发期 Vite 代理 `/api → http://localhost:8080`，Cookie 同源；演示时单 Jar 同域。
+- 前端路由 `hash` 模式（`/#/items`）；列表页搜索/排序/分页同步 URL query；列表卡片只展示名称/价格/时间，联系方式在详情页。
 
 ## 7. 目录结构
 
@@ -103,13 +104,14 @@ campus-secondhand/
 
 - 开发环境：后端 `8080`、前端 `5173`（Vite）、MySQL `3306`；后端用 `mvn spring-boot:run`，前端 `npm run dev`。
 - 演示部署：`frontend npm run build` → 复制 `dist/` 到 `backend/src/main/resources/static/` → `mvn clean package` → `java -jar`，浏览器访问 `http://localhost:8080`。
+- 前端使用 hash 路由，单 Jar 刷新不需要后端 SPA fallback；若改用 history 模式，需 D 增加统一 fallback 并同步文档。
 - 数据库账号/密码通过环境变量或本地 `application-local.yml` 注入，不提交仓库。
 - 数据库初始化：`sql/schema.sql` → `sql/data.sql`（命令见 [database-design.md](database-design.md)）。
 
 ## 9. 风险与待处理
 
 - **Session/Cookie 联调**是最大风险：M2 必须先打通「登录 → 刷新保持 → 401 处理」。
-- SQL 脚本尚未实机执行（本机 MySQL root 非免密）：M1 出口前由 A 在真实 MySQL 验证并记录。
+- SQL 脚本已实机验证通过（MySQL 8.4.11，2026-10-23）：建表、种子数据、约束与重复执行均正常。
 - 本机未安装 Maven；Git 未初始化、README 未创建：M1 出口前补齐。
 - 其余事项（成员信息、排期）已确认暂不处理，见 [design-review.md](design-review.md)。
 

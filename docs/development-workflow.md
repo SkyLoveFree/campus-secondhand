@@ -63,6 +63,7 @@
 ## 7. 构建与部署
 
 - 开发：后端 `mvn spring-boot:run`（8080）；前端 `npm run dev`（5173，Vite 代理 `/api` → 8080，Cookie 同源）。
+- 前端使用 hash 路由（`/#/...`），单 Jar 刷新无需后端 fallback；若改 history 模式，需 D 增加统一 fallback 并同步本文档。
 - 交付：单 Jar 同域部署，在仓库根目录执行（PowerShell）：
 
 ```powershell
