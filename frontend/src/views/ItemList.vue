@@ -2,9 +2,11 @@
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { listItems } from '@/api/item'
+import ItemCard from '@/components/ItemCard.vue'
 
 const DEFAULT_PAGE = 1
 const DEFAULT_SIZE = 10
+const PAGE_SIZES = [10, 20, 50]
 const SORT_OPTIONS = ['price_asc', 'price_desc']
 
 const route = useRoute()
@@ -23,13 +25,15 @@ const filters = computed(() => {
   const size = Number.parseInt(query.size, 10)
   return {
     page: Number.isInteger(page) && page >= 1 ? page : DEFAULT_PAGE,
-    size: Number.isInteger(size) && size >= 1 && size <= 50 ? size : DEFAULT_SIZE,
+    size: Number.isInteger(size) && PAGE_SIZES.includes(size) ? size : DEFAULT_SIZE,
     keyword: typeof query.keyword === 'string' ? query.keyword.trim() : '',
     sort: SORT_OPTIONS.includes(query.sort) ? query.sort : '',
   }
 })
 
-// 输入框草稿与 URL 中的关键词保持同步（清空/前进后退时也能正确回显）
+const hasActiveFilter = computed(() => Boolean(filters.value.keyword || filters.value.sort))
+
+// 输入框草稿与 URL 中的关键词保持同步（清空、前进/后退时都能正确回显）
 watch(
   () => filters.value.keyword,
   (keyword) => {
@@ -38,7 +42,7 @@ watch(
   { immediate: true }
 )
 
-// 请求序号：快速切换搜索/排序时，只允许最新一次响应更新页面，避免旧结果覆盖新结果
+// 请求序号：快速切换搜索/排序/分页时，只允许最新一次响应更新页面，避免旧结果覆盖新结果
 let requestSeq = 0
 
 async function loadItems() {
@@ -87,9 +91,9 @@ function handleSearch() {
   updateQuery({ keyword: keywordInput.value.trim(), page: DEFAULT_PAGE })
 }
 
-function handleResetSearch() {
+function handleResetFilters() {
   keywordInput.value = ''
-  updateQuery({ keyword: '', page: DEFAULT_PAGE })
+  updateQuery({ keyword: '', sort: '', page: DEFAULT_PAGE })
 }
 
 function handleSortChange(sort) {
@@ -100,9 +104,8 @@ function handlePageChange(page) {
   updateQuery({ page })
 }
 
-function formatPrice(price) {
-  const value = Number(price)
-  return Number.isFinite(value) ? value.toFixed(2) : '-'
+function handleSizeChange(size) {
+  updateQuery({ size, page: DEFAULT_PAGE })
 }
 </script>
 
@@ -113,64 +116,62 @@ function formatPrice(price) {
       <p v-if="!errorMessage" class="page__subtitle">共 {{ total }} 件商品</p>
     </div>
 
-    <div class="toolbar">
-      <el-input
-        v-model="keywordInput"
-        class="toolbar__search"
-        placeholder="搜索商品名称"
-        maxlength="50"
-        clearable
-        @keyup.enter="handleSearch"
-        @clear="handleResetSearch"
-      />
-      <el-button type="primary" @click="handleSearch">搜索</el-button>
+    <el-card shadow="never" class="toolbar-card">
+      <div class="toolbar">
+        <el-input
+          v-model="keywordInput"
+          class="toolbar__search"
+          placeholder="搜索商品名称"
+          maxlength="50"
+          clearable
+          @keyup.enter="handleSearch"
+          @clear="handleSearch"
+        />
+        <el-button type="primary" @click="handleSearch">搜索</el-button>
 
-      <el-select
-        class="toolbar__sort"
-        :model-value="filters.sort"
-        placeholder="排序方式"
-        @change="handleSortChange"
-      >
-        <el-option label="默认排序（最新发布）" value="" />
-        <el-option label="价格从低到高" value="price_asc" />
-        <el-option label="价格从高到低" value="price_desc" />
-      </el-select>
-    </div>
+        <el-select
+          class="toolbar__sort"
+          :model-value="filters.sort"
+          placeholder="默认排序（最新发布）"
+          @change="handleSortChange"
+        >
+          <el-option label="默认排序（最新发布）" value="" />
+          <el-option label="价格从低到高" value="price_asc" />
+          <el-option label="价格从高到低" value="price_desc" />
+        </el-select>
+
+        <el-button v-if="hasActiveFilter" text @click="handleResetFilters">清除筛选</el-button>
+      </div>
+    </el-card>
 
     <div v-if="errorMessage" class="state-block">
       <el-alert :title="errorMessage" type="error" show-icon :closable="false" />
       <el-button class="state-block__retry" @click="loadItems">重新加载</el-button>
     </div>
 
-    <div v-else v-loading="loading" class="item-grid">
-      <!-- 列表卡片只展示名称、价格、发布时间；联系方式仅在详情页展示 -->
-      <router-link
-        v-for="item in items"
-        :key="item.id"
-        :to="{ name: 'item-detail', params: { id: item.id } }"
-        class="item-card"
-      >
-        <h2 class="item-card__name">{{ item.item }}</h2>
-        <p class="item-card__price">￥{{ formatPrice(item.itemPrice) }}</p>
-        <p class="item-card__time">发布于 {{ item.createdAt }}</p>
-      </router-link>
+    <template v-else>
+      <div v-loading="loading" class="item-grid">
+        <ItemCard v-for="item in items" :key="item.id" :item="item" />
 
-      <el-empty
-        v-if="!loading && items.length === 0"
-        class="item-grid__empty"
-        description="暂无商品"
-      />
-    </div>
+        <el-empty
+          v-if="!loading && items.length === 0"
+          class="item-grid__empty"
+          :description="hasActiveFilter ? '没有找到匹配的商品' : '暂无商品'"
+        />
+      </div>
 
-    <div v-if="!errorMessage && total > 0" class="pagination">
-      <el-pagination
-        background
-        layout="prev, pager, next, total"
-        :total="total"
-        :page-size="filters.size"
-        :current-page="filters.page"
-        @current-change="handlePageChange"
-      />
-    </div>
+      <div v-if="total > 0" class="pagination">
+        <el-pagination
+          background
+          layout="total, sizes, prev, pager, next"
+          :total="total"
+          :page-size="filters.size"
+          :page-sizes="PAGE_SIZES"
+          :current-page="filters.page"
+          @current-change="handlePageChange"
+          @size-change="handleSizeChange"
+        />
+      </div>
+    </template>
   </section>
 </template>

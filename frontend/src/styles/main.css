@@ -119,12 +119,19 @@ a:hover {
 }
 
 /* 列表工具栏 */
+.toolbar-card {
+  margin-bottom: 16px;
+}
+
+.toolbar-card .el-card__body {
+  padding: 16px;
+}
+
 .toolbar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 12px;
-  margin-bottom: 16px;
 }
 
 .toolbar__search {
@@ -164,9 +171,15 @@ a:hover {
 }
 
 .item-card__name {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   margin: 0 0 8px;
+  min-height: 2.8em;
   font-size: 16px;
+  line-height: 1.4;
   word-break: break-all;
+  overflow: hidden;
 }
 
 .item-card__price {
@@ -188,11 +201,18 @@ a:hover {
 }
 
 .state-block__retry {
-  margin-top: 8px;
+  margin-top: 12px;
+}
+
+.state-block__actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
 }
 
 .pagination {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   margin-top: 24px;
 }
@@ -231,9 +251,18 @@ a:hover {
 }
 
 /* 详情页 */
+.page--detail {
+  max-width: 760px;
+}
+
+.detail {
+  min-height: 200px;
+}
+
 .detail-card__title {
   margin: 0 0 8px;
   font-size: 22px;
+  word-break: break-all;
 }
 
 .detail-card__price {
@@ -243,8 +272,23 @@ a:hover {
   font-weight: 600;
 }
 
+.detail-card__contact {
+  font-weight: 600;
+  color: var(--app-primary);
+  word-break: break-all;
+}
+
 .detail-card__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   margin-top: 20px;
+}
+
+.detail-card__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 /* 发布 / 编辑表单 */
@@ -274,5 +318,9 @@ a:hover {
   .toolbar__sort {
     max-width: none;
     width: 100%;
+  }
+
+  .pagination {
+    margin-top: 16px;
   }
 }
