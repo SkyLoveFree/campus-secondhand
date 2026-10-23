@@ -68,9 +68,9 @@
   - [x] A 已确认 §4 五项（2026-10-23）。
   - [x] A 已在 MySQL 8.4.11 实机验证通过（2026-10-23；`schema.sql` + `data.sql` 可重复执行、约束生效）。
   - [x] Maven Wrapper 已提交（`backend/mvnw`、`backend/mvnw.cmd`），本机 Maven 3.9.16 可用。
-  - [x] 仓库、README、`.gitignore` 已就绪并推送；GitHub 分支保护待 A 在网页上设置。
+  - [x] 仓库、README、`.gitignore` 已就绪并推送；按 A 决定**不启用 GitHub 分支保护**（A 直接管理 `main`，代码仍按功能分支 + PR 的约定执行）。
   - [x] M2 已启动（见 §7）。
-- 当前风险：Session/Cookie 联调已通过本地验证（单 Jar + 代理）；M3 商品接口未实现（列表页暂显示错误态）；分支保护未配置；D3/D4 待开发。
+- 当前风险：Session/Cookie 联调已通过本地验证（单 Jar + 代理）；M3 进行中（商品查询接口开发/联调）；分支保护不由 GitHub 强制（A 把关）；M4 写接口待开发。
 
 ## 7. M2 进度（2026-10-23）
 
