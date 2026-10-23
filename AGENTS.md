@@ -1,7 +1,7 @@
 # 校园二手交易系统 — AGENTS.md
 
 > 项目：JavaWeb 课程期末大作业（4 人小组，前端 Vue + 后端 Spring Boot + MySQL）。本文件是规则入口，细节见 `docs/`。
-> 阶段：M2（骨架与认证）——按 `docs/team-assignments.md` 的任务范围开发；未分配模块不得改动。
+> 阶段：M3（商品查询）——按 `docs/team-assignments.md` 的任务范围开发；未分配模块不得改动。
 > 标记：✅ 已确认 ｜ 🟡 建议方案（按此执行，有异议先找 A）｜ ⏳ 待确认。最后更新：2026-10-23（v1.1 精简版）。
 
 ## 1. 项目简介与目标
@@ -147,5 +147,5 @@ campus-secondhand/
 | `sql/schema.sql`、`sql/data.sql` | 建表与测试数据脚本 |
 | `README.md` | 环境、启动、部署（M2/M5 阶段补） |
 
-- 当前：M2 进行中（2026-10-23）。M1 已冻结；C 脚本已验证；D1/D2 后端骨架+认证、B1/B2/B3/B6 前端骨架+登录注册页已完成；下一步 M3（商品查询接口 + 列表/详情页）。
+- 当前：M3 已完成初版（2026-10-23）。M1/M2 已完成；D3 商品查询接口、B4/B5 列表/详情页已完成并验证；下一步 M4（发布/修改/删除 + 权限联调）。
 - 文档冲突时：需求看 requirements、接口看 api-spec、表结构看 database-design/schema.sql、流程看 development-workflow；仍冲突先停下问 A。
