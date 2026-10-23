@@ -111,4 +111,4 @@ java -jar $jar.FullName
 
 ## 当前阶段
 
-M2：后端骨架 + 认证模块、前端骨架 + 请求层 + 登录注册页。后续按 [`docs/team-assignments.md`](docs/team-assignments.md) 的 M3～M5 推进。
+M2（2026-10-23）：后端骨架 + 认证模块、前端骨架 + 请求层 + 登录注册页已完成初版；下一步 M3（商品查询接口 + 列表/详情页），按 [`docs/team-assignments.md`](docs/team-assignments.md) 推进。

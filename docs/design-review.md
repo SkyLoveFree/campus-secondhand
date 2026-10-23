@@ -1,6 +1,6 @@
 # 校园二手交易系统 — 设计文档交叉评审记录（精简版）
 
-> 文档编号：REV-001 ｜ 版本：v1.1（精简版）｜ 状态：评审完成（A 已确认 5 项、SQL 已实机验证，2026-10-23）｜ 最后更新：2026-10-23
+> 文档编号：REV-001 ｜ 版本：v1.1（精简版）｜ 状态：M1 已完成，M2 进行中（2026-10-23）｜ 最后更新：2026-10-23
 > 评审整理：A（项目负责人）｜ 关联：[需求](requirements.md) · [架构](architecture.md) · [API](api-spec.md) · [数据库](database-design.md) · [分工](team-assignments.md) · [流程](development-workflow.md) · [AGENTS](../AGENTS.md)
 
 ## 1. 评审结论
@@ -62,18 +62,27 @@
 - **修复**：统一版本为 v1.1（精简版）；修正 database-design 中旧的章节/版本引用；数据库初始化命令改为 PowerShell 可执行的 `cmd /c` 写法；启动 Jar 命令改为变量写法；重写本评审记录；统一 MySQL 8.0.16+ 口径与权限矩阵表述。
 - **已完成**：SQL 于 2026-10-23 在 MySQL 8.4.11 实机验证通过（`schema.sql` + `data.sql` 连续执行两次成功，表/索引/约束/种子数据核验一致；代理复验结果相同）。
 
-## 6. 风险与 M1 出口清单
+## 6. M1 出口清单（已完成）与风险
 
-- 主要风险：Session/Cookie 联调（M2 第一优先打通登录态）；本机未安装 Maven；README、`.gitignore`、Git 仓库尚未初始化（SQL 已验证通过）。
-- M1 出口（进入 M2 前完成）：
+- M1 出口（2026-10-23 全部完成）：
   - [x] A 已确认 §4 五项（2026-10-23）。
   - [x] A 已在 MySQL 8.4.11 实机验证通过（2026-10-23；`schema.sql` + `data.sql` 可重复执行、约束生效）。
-  - [ ] D 安装 Maven 3.9+ 或提交 Maven Wrapper。
-  - [ ] A 完成 `git init` + 远端 + `.gitignore` + README 骨架（含测试账号与启动步骤）+ GitHub 分支保护。
-  - [ ] 全员确认任务与契约，设计冻结，进入 M2：C 建库 → D 骨架 + 认证 → B 骨架 + 请求层 → 登录态联调。
+  - [x] Maven Wrapper 已提交（`backend/mvnw`、`backend/mvnw.cmd`），本机 Maven 3.9.16 可用。
+  - [x] 仓库、README、`.gitignore` 已就绪并推送；GitHub 分支保护待 A 在网页上设置。
+  - [x] M2 已启动（见 §7）。
+- 当前风险：Session/Cookie 联调已通过本地验证（单 Jar + 代理）；M3 商品接口未实现（列表页暂显示错误态）；分支保护未配置；D3/D4 待开发。
 
-## 7. 变更记录
+## 7. M2 进度（2026-10-23）
+
+- 后端（D1/D2）完成：Spring Boot 3.3.5 + MyBatis 骨架、统一响应/异常、Session 拦截器、注册/登录/登出/me；`backend/mvnw.cmd test` 34 个测试全过。
+- 运行验证：本地 8080 启动后认证接口 E2E 11/11 通过（未登录 401、错误密码 401、admin/student 登录、/me、注册、重复 409、参数 400、登出）；`/api/items` 按预期 404（M3 未实现）。
+- 前端（B1/B2/B3/B6 初版）完成：Vue3 + Vite + Pinia + Element Plus、hash 路由、请求层、登录/注册页、Header、列表页骨架（URL query 同步、卡片字段）；`npm run build` 通过。
+- 集成冒烟：前端 dist 复制到 `backend/src/main/resources/static/` 后单 Jar 启动，`GET /` 返回页面、静态资源 200、student 登录 + `/me` 成功。
+- 代码提交：`3909e50`（backend）、`e0faf29`（frontend）；文档提交 `e730baa`、`26f0ab2` 均已推送 `origin/main`。
+- 下一步（M3）：D3 商品查询接口（列表/搜索/排序/分页/详情）、B4/B5 列表/详情页真实数据与联调、C 复核 Mapper SQL。
+
+## 8. 变更记录
 
 | 日期 | 版本 | 修改人 | 内容 |
 |---|---|---|---|
-| 2026-10-23 | v1.1 | A | 精简版：压缩至约 1,060 行；待确认收敛为 5 项；安全按基础要求；重写评审结论与 M1 出口清单；同日 A 确认 5 项（见 §4）；SQL 实机验证通过（代理复验一致）；确认前端 4 项（Pinia/hash/URL 同步/列表不展示联系方式，Q6～Q9） |
+| 2026-10-23 | v1.1 | A | 精简版：压缩至约 1,060 行；待确认收敛为 5 项；安全按基础要求；重写评审结论与 M1 出口清单；同日 A 确认 5 项（见 §4）；SQL 实机验证通过（代理复验一致）；确认前端 4 项（Pinia/hash/URL 同步/列表不展示联系方式，Q6～Q9）；进入 M2：后端骨架+认证、前端骨架+登录注册完成并推送（3909e50/e0faf29） |
