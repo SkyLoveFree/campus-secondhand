@@ -1,6 +1,7 @@
 package com.campus.secondhand.service;
 
 import com.campus.secondhand.dto.ItemQueryRequest;
+import com.campus.secondhand.dto.ItemSaveRequest;
 import com.campus.secondhand.dto.ItemVO;
 import com.campus.secondhand.dto.PageResult;
 
@@ -28,4 +29,29 @@ public interface ItemService {
      * @throws com.campus.secondhand.common.BusinessException ID 非法（400/10001）或商品不存在（404/10005）
      */
     ItemVO getItem(Long id);
+
+    /**
+     * 发布商品（F-08，需登录）：归属 userId 只取 Session 当前用户，请求中的 userId 一律忽略。
+     *
+     * @param request       已校验的发布请求
+     * @param currentUserId Session 当前用户 ID（拦截器保证已登录）
+     * @return 创建后的商品视图对象
+     */
+    ItemVO createItem(ItemSaveRequest request, Long currentUserId);
+
+    /**
+     * 修改商品（F-09，需登录）：仅本人或管理员可改；不改归属与创建时间。
+     * 判定顺序：商品不存在 404 → 非本人且非管理员 403。
+     *
+     * @throws com.campus.secondhand.common.BusinessException 404/10005、403/10004
+     */
+    ItemVO updateItem(Long id, ItemSaveRequest request, Long currentUserId, String currentRole);
+
+    /**
+     * 删除商品（F-10，需登录）：仅本人或管理员可删，物理删除。
+     * 判定顺序：商品不存在 404 → 非本人且非管理员 403。
+     *
+     * @throws com.campus.secondhand.common.BusinessException 404/10005、403/10004
+     */
+    void deleteItem(Long id, Long currentUserId, String currentRole);
 }

@@ -1,8 +1,10 @@
 package com.campus.secondhand.service.impl;
 
 import com.campus.secondhand.common.BusinessException;
+import com.campus.secondhand.common.Constants;
 import com.campus.secondhand.common.ErrorCode;
 import com.campus.secondhand.dto.ItemQueryRequest;
+import com.campus.secondhand.dto.ItemSaveRequest;
 import com.campus.secondhand.dto.ItemVO;
 import com.campus.secondhand.dto.PageResult;
 import com.campus.secondhand.entity.Item;
@@ -11,6 +13,7 @@ import com.campus.secondhand.service.ItemService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -87,6 +90,66 @@ public class ItemServiceImpl implements ItemService {
             throw new BusinessException(ErrorCode.NOT_FOUND, "商品不存在");
         }
         return toItemVO(item);
+    }
+
+    @Override
+    @Transactional
+    public ItemVO createItem(ItemSaveRequest request, Long currentUserId) {
+        Item item = new Item();
+        item.setItem(request.getItem());
+        item.setItemPrice(request.getItemPrice());
+        item.setContactInfo(request.getContactInfo());
+        // 归属只取 Session 当前用户，请求体中的 userId 一律忽略（文档安全要求）
+        item.setUserId(currentUserId);
+        itemMapper.insert(item);
+        log.info("商品发布成功: id={}, userId={}", item.getId(), currentUserId);
+        return toItemVO(itemMapper.selectById(item.getId()));
+    }
+
+    @Override
+    @Transactional
+    public ItemVO updateItem(Long id, ItemSaveRequest request, Long currentUserId, String currentRole) {
+        Item existing = loadAndCheckPermission(id, currentUserId, currentRole);
+        existing.setItem(request.getItem());
+        existing.setItemPrice(request.getItemPrice());
+        existing.setContactInfo(request.getContactInfo());
+        // 不更新 user_id 与 created_at；updated_at 由 SQL 的 CURRENT_TIMESTAMP 刷新
+        int updated = itemMapper.update(existing);
+        if (updated == 0) {
+            throw new BusinessException(ErrorCode.NOT_FOUND, "商品不存在");
+        }
+        log.info("商品修改成功: id={}, operatorId={}", id, currentUserId);
+        return toItemVO(itemMapper.selectById(id));
+    }
+
+    @Override
+    @Transactional
+    public void deleteItem(Long id, Long currentUserId, String currentRole) {
+        loadAndCheckPermission(id, currentUserId, currentRole);
+        int deleted = itemMapper.deleteById(id);
+        if (deleted == 0) {
+            throw new BusinessException(ErrorCode.NOT_FOUND, "商品不存在");
+        }
+        log.info("商品删除成功: id={}, operatorId={}", id, currentUserId);
+    }
+
+    /**
+     * 权限判定（改/删共用）：先查存在性（404），再比对归属（管理员放行，否则仅本人，其余 403）。
+     * 归属只依据数据库 item.user_id 与 Session 当前用户 ID，不信任请求中的任何 userId。
+     */
+    private Item loadAndCheckPermission(Long id, Long currentUserId, String currentRole) {
+        if (id == null || id <= 0) {
+            throw paramInvalid("id", "商品ID必须为正整数");
+        }
+        Item item = itemMapper.selectById(id);
+        if (item == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND, "商品不存在");
+        }
+        boolean isAdmin = Constants.ROLE_ADMIN.equals(currentRole);
+        if (!isAdmin && !item.getUserId().equals(currentUserId)) {
+            throw new BusinessException(ErrorCode.FORBIDDEN, "只能操作自己发布的商品");
+        }
+        return item;
     }
 
     /**
