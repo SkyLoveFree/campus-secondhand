@@ -8,6 +8,7 @@
 - 仓库：https://github.com/SkyLoveFree/campus-secondhand（公开，默认 `main`）。
 - `main` 为可运行分支，**禁止直接 push / force push**；功能分支 `feature/<成员>-<模块>`（如 `feature/d-item-api`、`feature/b-item-list`、`feature/c-db-init`），修复 `fix/<简述>`，文档 `docs/<主题>`。
 - 流程：最新 `main` 切出 → 小步提交 → 自测 → rebase `main` → PR → A 合并（Merge Commit）→ 删除分支。
+- **文档/决策同步例外**：A 确认决定或修改 `docs/`、`AGENTS.md`、`README.md` 后，直接在 `main` 提交并 push（代码变更仍走功能分支 + PR）；推完通知队友 `git pull`。
 
 ## 2. Commit 规范
 

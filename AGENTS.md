@@ -113,6 +113,7 @@ campus-secondhand/
 ## 11. Git 协作与代码提交
 
 - `main` 分支可运行、禁止直接 push；功能分支 `feature/<成员>-<模块>`（如 `feature/d-item-api`），修复 `fix/<简述>`。
+- 文档同步（A 的例外）：A 确认决定或修改 `docs/`、`AGENTS.md`、`README.md` 后，可直接在 `main` 提交并 push，队友及时 `git pull`；代码变更仍走功能分支 + PR。
 - Commit：Conventional Commits + 中文说明，如 `feat(item): 商品列表搜索与排序`；小步提交，每人保留自己的提交记录。
 - PR：Reviewer 至少 A + 1 名相关成员；合并用 **Merge Commit，禁止 Squash**（课程要个人提交记录）。
 - 不提交敏感信息、构建产物、依赖目录；冲突先 rebase，不得丢弃他人代码。
