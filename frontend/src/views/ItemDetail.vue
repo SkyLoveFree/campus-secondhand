@@ -1,17 +1,18 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getItem } from '@/api/item'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { deleteItem, getItem } from '@/api/item'
 import { useUserStore } from '@/stores/user'
 
 // B5 详情页：联系方式只在详情页展示；「编辑/删除」入口仅对本人或 ADMIN 显示。
-// TODO(M4): 编辑页提交与删除二次确认（ElMessageBox.confirm + deleteItem）在 M4 实现。
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
 
 const item = ref(null)
 const loading = ref(false)
+const deleting = ref(false)
 const errorMessage = ref('')
 // 'notFound'（404 空态）/ 'badRequest'（400 参数错误）/ 'error'（其他错误）
 const errorType = ref('')
@@ -72,9 +73,39 @@ function goBackToList() {
 }
 
 function handleEdit() {
-  // TODO(M4): 编辑页数据回填与保存（ItemForm.vue）在 M4 完成
   if (!item.value) return
   router.push({ name: 'item-edit', params: { id: item.value.id } })
+}
+
+// 删除：二次确认后物理删除；成功回列表，404 刷新为空态，403 提示由请求层统一弹出
+async function handleDelete() {
+  if (!item.value || deleting.value) return
+
+  try {
+    await ElMessageBox.confirm(`确定删除商品「${item.value.item}」吗？删除后不可恢复。`, '删除确认', {
+      confirmButtonText: '删除',
+      cancelButtonText: '取消',
+      type: 'warning',
+    })
+  } catch {
+    return // 用户取消
+  }
+
+  deleting.value = true
+  try {
+    await deleteItem(item.value.id)
+    ElMessage.success('商品已删除')
+    router.push({ name: 'item-list' })
+  } catch (error) {
+    if (error?.code === 10005) {
+      ElMessage.error('商品不存在或已被删除')
+      loadItem()
+    } else if (error?.code !== 10004) {
+      ElMessage.error(error?.message || '删除失败，请稍后重试')
+    }
+  } finally {
+    deleting.value = false
+  }
 }
 
 function formatPrice(price) {
@@ -125,16 +156,12 @@ function formatPrice(price) {
           <el-descriptions-item label="更新时间">{{ item.updatedAt }}</el-descriptions-item>
         </el-descriptions>
 
-        <!-- 本人或 ADMIN 可见；删除按钮 M4 接入真实操作 -->
+        <!-- 本人或 ADMIN 可见；前端显隐只是体验，权限由后端强制校验 -->
         <div v-if="canManage" class="detail-card__actions">
           <el-tag type="success" effect="plain">{{ manageHint }}</el-tag>
           <div class="detail-card__buttons">
             <el-button type="primary" @click="handleEdit">编辑商品</el-button>
-            <el-tooltip content="删除功能将在 M4 阶段实现" placement="top">
-              <span>
-                <el-button type="danger" disabled>删除商品</el-button>
-              </span>
-            </el-tooltip>
+            <el-button type="danger" :loading="deleting" @click="handleDelete">删除商品</el-button>
           </div>
         </div>
       </el-card>
