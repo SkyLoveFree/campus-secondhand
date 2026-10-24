@@ -144,6 +144,8 @@ campus-secondhand/
 | [team-assignments.md](docs/team-assignments.md) | 分工、任务、里程碑 |
 | [development-workflow.md](docs/development-workflow.md) | Git、PR、联调、部署 |
 | [design-review.md](docs/design-review.md) | 交叉核对与确认结论 |
+| [user-manual.md](docs/user-manual.md) | 使用/部署/演示手册 |
+| [presentation-and-qa.md](docs/presentation-and-qa.md) | 答辩讲解稿与常见问答 |
 | `sql/schema.sql`、`sql/data.sql` | 建表与测试数据脚本 |
 | `README.md` | 环境、启动、部署（M2/M5 阶段补） |
 

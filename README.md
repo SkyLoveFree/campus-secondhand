@@ -128,6 +128,13 @@ java -jar $jar.FullName
 | 管理员-管理他人商品 | [13-管理员-管理他人商品](screenshots/13-管理员-管理他人商品.png) |
 | 登出后-游客状态 | [14-登出后-游客状态](screenshots/14-登出后-游客状态.png) |
 
+## 项目文档
+
+- [使用手册](docs/user-manual.md)：环境、初始化、启动、功能操作、常见问题、演示检查清单
+- [答辩讲解与问答](docs/presentation-and-qa.md)：12～15 分钟讲解稿、现场演示脚本、43 个常见问题参考答案
+- [需求规格](docs/requirements.md) · [系统架构](docs/architecture.md) · [API 规范](docs/api-spec.md) · [数据库设计](docs/database-design.md)
+- [设计评审与验收](docs/design-review.md) · [分工计划](docs/team-assignments.md) · [开发流程](docs/development-workflow.md)
+
 ## 接口文档
 
 - 完整契约：[`docs/api-spec.md`](docs/api-spec.md)（9 个接口、错误码、示例）
