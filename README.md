@@ -141,6 +141,12 @@ java -jar $jar.FullName
 - 文档/决策同步：A 确认决定或修改 `docs/`、`AGENTS.md` 后直接提交并 push `main`，队友及时 `git pull` 同步
 - 详细规则：[`docs/development-workflow.md`](docs/development-workflow.md)
 
+## 交付
+
+- 版本：tag `v1.0`（2026-10-24）
+- 交付 ZIP：`campus-secondhand-v1.0.zip`（源码 + `docs/` + `sql/` + `screenshots/` + 可运行单 Jar）；按课程要求重命名为「组号-组员姓名-项目名称」后提交
+- 验收记录：[`docs/design-review.md`](docs/design-review.md) §7.5（77 后端测试、查询 13/13、写入 23/23、文案 5/5、UI 8/8）
+
 ## 当前阶段
 
-M4 收尾 / M5 交付准备（2026-10-24）：B 的 14 张演示截图、C 的数据库最终校验与演示数据说明已合并验收；M5 单 Jar 部署冒烟已通过。待补：D 的 M4 错误文案修复（PR #7 无实际改动）与 M5 后端部署说明。补齐后做最终全量回归、打 tag `v1.0`、生成交付 ZIP。
+v1.0 已交付（2026-10-24）。后续仅需课程总结报告/PPT、答辩演示准备；功能与文档冻结。
