@@ -99,6 +99,42 @@ DELETE FROM item WHERE id = #{id};
 2. 价格升序为混合方向排序（`item_price ASC` + `id DESC`），MySQL 索引无法直接支持；万级数据量下 filesort 为毫秒级（LIMIT 优先队列排序），课程规模可接受，不额外加索引。
 3. 同向全 DESC 排序（默认列表、价格降序）可利用索引反向扫描早退，分页首页仅读取 size 行。
 
+## 6.2 Mapper SQL 评审记录（C5 / M4-C1）
+
+评审对象：`backend/src/main/resources/mapper/ItemMapper.xml`（D3 查询 + D4 写操作，随 PR #2 合并，提交 `faf837e`）。评审人：C，日期：2026-10-24。评审方式：逐条核对 XML 与 `ItemServiceImpl` 调用语义。
+
+| 检查项 | 结论 | 依据 |
+|---|---|---|
+| 参数化（禁 `${}`） | ✅ 通过 | `insert`/`update`/`deleteById`/`selectById`/`selectList`/`countList` 全部 `#{}` |
+| user_id 不可更新 | ✅ 通过 | UPDATE 的 SET 仅 item/item_price/contact_info/updated_at；insert 的 userId 由 Service 从 Session 写入（`createItem` 忽略请求体 userId） |
+| updated_at 刷新 | ✅ 通过 | UPDATE 显式 `updated_at = CURRENT_TIMESTAMP`，不依赖 ON UPDATE 隐式行为 |
+| 影响行数 0 → 404 | ✅ 通过 | Service `updateItem`/`deleteItem` 判断影响行数为 0 抛 NOT_FOUND |
+| 排序白名单 | ✅ 通过 | XML `<choose>` 固定映射 3 种 ORDER BY；Service `ALLOWED_SORTS` 二次校验，非法 sort 抛 400（C5 初审提醒项已落实） |
+| COUNT 与列表同 WHERE | ✅ 通过 | 共用 `<sql id="searchCondition">` 片段 |
+| LIKE 转义 | ✅ 通过 | Java 层转义 `\`、`%`、`_`，SQL 端固定 `ESCAPE '\\'`，无重复/遗漏 |
+| 权限与归属判定 | ✅ 通过 | 先 selectById 判 404，再比对归属（ADMIN 放行，非本人 403）；不信任请求体 userId |
+
+已知提醒（非阻塞，不属 SQL 层）：
+1. 404/403 的 message 与 api-spec 固定文案存在差异（"商品不存在"/"只能操作自己发布的商品" vs "商品不存在或已删除"/"无权限执行该操作"），已由 M4-D1（`fix/d-contract-messages`）跟进对齐。
+2. UPDATE/DELETE 的 WHERE 仅按 `id`，未附加 `user_id` 条件：因 user_id 永不变更、Service 已先行权限校验且写操作 `@Transactional`，无竞态风险，无需修改。
+
+**结论：ItemMapper.xml 写/查 SQL 评审通过（C5 / M4-C1 完成）。**
+
+## 6.3 写操作实机验证记录（M4-C2）
+
+验证环境：MySQL 8.0.46（C 本机），库 `campus_secondhand`；先重放 `schema.sql` + `data.sql` 恢复干净种子，再按 Mapper 同款 SQL 手工执行「发布 → 修改 → 删除」，最后重放 `data.sql` 恢复种子。验证人：C，日期：2026-10-24。
+
+| 步骤 | 操作 | 结果 | 判定 |
+|---|---|---|---|
+| 1 | 重放后初始状态 | users=2、items=5 | ✅ 干净种子 |
+| 2 | 发布：INSERT（user_id=2，模拟 Session 归属） | 影响行数 1；新 id=6；created_at=updated_at 非空 | ✅ |
+| 3 | 修改：UPDATE（不含 user_id，显式 `updated_at=CURRENT_TIMESTAMP`） | 影响行数 1；user_id 仍为 2 未变；updated_at(14:51:44) > created_at(14:51:43) | ✅ 归属不变、时间刷新 |
+| 4 | 修改不存在 id=999999 | 影响行数 0 | ✅ 对应 Service 404 分支 |
+| 5 | 删除 id=6；再重复删除 | 影响行数 1；重复删除 0 | ✅ 首次删除成功、重复删除对应 404 |
+| 6 | 重放 `data.sql` 恢复 | users=2、items=5（id 1–5，均归属 student） | ✅ 种子可恢复 |
+
+**结论：写操作数据正确性实机验证通过（M4-C2 完成），数据库已恢复干净种子状态。**
+
 ## 7. 初始化与验证
 执行顺序：`sql/schema.sql`（建库、删表重建）→ `sql/data.sql`（先删后插，可重复执行）。脚本 UTF-8 无 BOM。
 
@@ -134,3 +170,4 @@ mysql -u<user> -p --default-character-set=utf8mb4 < sql\data.sql
 ## 11. 变更记录
 2026-10-23：v1.0-draft（C，详细版）→ v1.1 精简版（C，按课程定位压缩文档与脚本注释，表结构/口径不变）；A 已确认按当前方案执行；SQL 于 2026-10-23 实机验证通过（MySQL 8.4.11）。
 2026-10-23：追加 §6.1 EXPLAIN 实机验证记录（C4，C 于本机 MySQL 8.0.46 完成；含 10005 行压测与"混合方向排序不走索引"的取舍说明）。
+2026-10-24：追加 §6.2 Mapper SQL 评审记录（C5 / M4-C1，C 评审 D 写操作 PR #2 的 ItemMapper.xml，结论通过；含 2 条非阻塞提醒）；追加 §6.3 写操作实机验证记录（M4-C2，干净库重放后手工验证发布/修改/删除，通过并恢复种子）。
