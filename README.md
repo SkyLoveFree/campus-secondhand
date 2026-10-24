@@ -111,4 +111,4 @@ java -jar $jar.FullName
 
 ## 当前阶段
 
-M3（2026-10-23）：商品查询接口（列表/搜索/排序/分页/详情）与列表页/详情页已完成并验证；下一步 M4（发布/修改/删除 + 权限联调），按 [`docs/team-assignments.md`](docs/team-assignments.md) 推进。
+M4（2026-10-24）：D 商品发布/修改/删除接口已合并并通过验收（23/23 E2E）；M4 剩余任务（B 表单/删除、C Mapper 评审、D 文案修复）见 [`docs/team-assignments.md`](docs/team-assignments.md) §9；下一步 M4 全量回归 → M5 交付。

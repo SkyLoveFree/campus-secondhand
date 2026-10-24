@@ -91,4 +91,33 @@
 > 另：SQL 脚本已由 A 于 2026-10-23 在 MySQL 8.4.11 实机验证通过（schema/data 可重复执行、约束生效；代理复验一致），C 协助复核。
 
 ---
+## 9. M4/M5 分工（2026-10-24）
+
+> 当前状态：D 的写接口（faf837e）与 C 的 C4 文档（df07be8）已合并并通过 A 验收；B 的 M4 前端、C 的 C5 评审、D 的文案修复尚未完成。A 只做评审 / 整合 / 验收 / 文档，不写业务代码。
+
+### 9.1 M4 任务分配
+
+| 编号 | 负责人 | 分支 | 任务内容 | 交付 / 验收 | 前置依赖 |
+|---|---|---|---|---|---|
+| M4-D1 | D | `fix/d-contract-messages` | 将 10004/10005/10008/10500 的 message 对齐 api-spec 固定文案（无权限执行该操作 / 商品不存在或已删除 / 请求方法不支持 / 服务器内部错误，请稍后重试）；修正 ItemSaveRequest 过期注释；同步更新受影响测试 | `mvnw test` 全过；4xx JSON message 与 api-spec 一致；PR 合并 | 无（优先做） |
+| M4-B1 | B | `feature/b-item-form` | ItemForm 发布/编辑：`/publish` 调 createItem、`/items/:id/edit` 调 getItem 回填 + updateItem；表单校验与 api-spec 一致；成功跳详情/列表，401 跳登录，403/404/400 提示 | 发布/编辑全流程通过；`npm run build` 通过 | D 写接口（已合并） |
+| M4-B2 | B | `feature/b-item-actions` | 详情页删除（ElMessageBox 二次确认 → deleteItem → 成功返回列表）；列表/详情「编辑/删除」入口按本人或 ADMIN 显隐，游客不显示；403/404 提示 | F-09/F-10 前端流程通过；无 console error | M4-B1 |
+| M4-B3 | B | `feature/b-m4-integration` | 与 D 联调发布/编辑/删除；补充 README 前端运行/构建说明；提交自测记录（角色 × 操作） | 三流程联调通过；build 通过；PR 合并 | M4-B1/B2 |
+| M4-C1 | C | `feature/c-mapper-review` | C5：评审 `ItemMapper.xml` 写/查 SQL（insert/update/deleteById/selectList/countList/selectById）：参数化、user_id 不可更新、updated_at 刷新、影响行数 404、排序白名单 | 评审记录（database-design §6.2 或 PR comment）+ 结论；PR 合并 | D 代码（已合并） |
+| M4-C2 | C | `feature/c-mapper-review` | 在干净 MySQL 重放 schema/data，手工验证「发布 → 修改 → 删除」数据正确（user_id 归属、updated_at、行数）；验证后恢复种子数据 | 命令/结果记录；2 用户 + 5 商品可恢复 | M4-C1 |
+| M4-A1 | A | — | 验收已合并的 D 写接口与 C4 文档（已完成：E2E 23/23、77 测试、C4 记录） | 验收结论写入 design-review | — |
+| M4-A2 | A | — | 合并 M4-D1/B1/B2/B3/C1/C2 的 PR；跑 M4 全量回归（9 接口 × 游客/USER/ADMIN）；更新文档并推送 | 回归通过；main 可构建；文档同步 | 上述任务 |
+| M4-A3 | A | — | 决定错误文案方案（建议按 api-spec 对齐）、清理已合并分支 | 记录 + 合并 | M4-D1 |
+
+**执行顺序**：M4-D1（文案修复）→ B1/B2 并行 + C1/C2 并行 → B3 联调 → A2 全量回归。每个分支提 PR 到 `main`，A 用 Merge Commit 合并（禁止 Squash），合并后删除分支；不得代提交他人代码。
+
+### 9.2 M5 交付任务（提前认领）
+
+| 编号 | 负责人 | 任务内容 | 交付 |
+|---|---|---|---|
+| M5-B | B | 前端最终构建、README 前端说明、UI 走查与截图 | `npm run build` 成功；README 前端章节；演示截图 |
+| M5-C | C | 数据库初始化/重置验证记录、演示数据说明、SQL 脚本最终校验 | 验证记录；`database-design.md` 更新 |
+| M5-D | D | 后端打包/单 Jar 启动说明、`mvnw test` 最终结果、部署故障排查 | 部署说明；Jar 可运行；测试记录 |
+| M5-A | A | README 汇总、tag `v1.0`、交付 ZIP、总结报告/PPT、最终验收 | 交付包与验收签字 |
+
 > [需求规格](requirements.md) · [系统架构](architecture.md) · [API 契约](api-spec.md) · [数据库设计](database-design.md) · [协作流程](development-workflow.md)

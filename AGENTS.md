@@ -1,7 +1,7 @@
 # 校园二手交易系统 — AGENTS.md
 
 > 项目：JavaWeb 课程期末大作业（4 人小组，前端 Vue + 后端 Spring Boot + MySQL）。本文件是规则入口，细节见 `docs/`。
-> 阶段：M3（商品查询）——按 `docs/team-assignments.md` 的任务范围开发；未分配模块不得改动。
+> 阶段：M4（写入与权限）——按 `docs/team-assignments.md` §9 的分工开发；未分配任务不得改动。
 > 标记：✅ 已确认 ｜ 🟡 建议方案（按此执行，有异议先找 A）｜ ⏳ 待确认。最后更新：2026-10-23（v1.1 精简版）。
 
 ## 1. 项目简介与目标
@@ -130,7 +130,7 @@ campus-secondhand/
 6. 不提交数据库密码、Token 等敏感信息，不写入响应/日志。
 7. 只做分配模块，不越权修改他人目录；发现冲突/漏洞先报告。
 8. 复杂实现（权限判定、搜索排序）说明思路，保证同学能讲清楚。
-9. 当前是 M3 编码阶段：按 `docs/team-assignments.md` 中分配的任务范围开发；未分配模块或未列入本期需求的功能不主动实现。
+9. 当前是 M4 编码阶段：按 `docs/team-assignments.md` §9 中分配的任务范围开发；未分配任务或未列入本期需求的功能不主动实现。
 10. 完成后汇报：改了哪些文件、怎么验证、有什么待确认。
 
 ## 13. 文档地图与当前阶段
@@ -147,5 +147,5 @@ campus-secondhand/
 | `sql/schema.sql`、`sql/data.sql` | 建表与测试数据脚本 |
 | `README.md` | 环境、启动、部署（M2/M5 阶段补） |
 
-- 当前：M3 已完成初版（2026-10-23）。M1/M2 已完成；D3 商品查询接口、B4/B5 列表/详情页已完成并验证；下一步 M4（发布/修改/删除 + 权限联调）。
+- 当前：M4 进行中（2026-10-24）。M1/M2/M3 已完成；D 写接口已合并验收；B 表单/删除、C Mapper 评审、D 文案修复待完成（分工见 [team-assignments.md](docs/team-assignments.md) §9）；下一步 M4 全量回归 → M5 交付。
 - 文档冲突时：需求看 requirements、接口看 api-spec、表结构看 database-design/schema.sql、流程看 development-workflow；仍冲突先停下问 A。
