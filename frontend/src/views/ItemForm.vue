@@ -2,16 +2,15 @@
 import { computed, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { createItem, getItem, updateItem } from '@/api/item'
 
-// TODO(M3/M4): M2 只做发布/编辑表单骨架，以下逻辑待 M3/M4 接入：
-// 1. 编辑模式先调用 getItem(id) 回填表单（并处理 404/403）；
-// 2. 发布调用 createItem、编辑调用 updateItem，成功后跳转详情或列表；
-// 3. 400/fieldErrors 回填到对应表单项。
+// 发布/编辑共用表单：契约见 docs/api-spec.md §3.7/§3.8；归属由后端 Session 决定，前端不传 userId
 const route = useRoute()
 const router = useRouter()
 
 const formRef = ref()
 const submitting = ref(false)
+const loadingItem = ref(false)
 const isEdit = computed(() => route.name === 'item-edit')
 const pageTitle = computed(() => (isEdit.value ? '编辑商品' : '发布商品'))
 
@@ -64,6 +63,36 @@ const rules = {
   contactInfo: [{ validator: validateText(100, '请输入联系方式'), trigger: 'blur' }],
 }
 
+// 编辑模式：进入时回填表单；商品不存在则提示并返回列表
+async function loadForEdit() {
+  if (!isEdit.value) return
+  loadingItem.value = true
+  try {
+    const data = await getItem(route.params.id)
+    form.item = data.item
+    form.itemPrice = Number(data.itemPrice)
+    form.contactInfo = data.contactInfo
+  } catch (error) {
+    ElMessage.error(error?.code === 10005 ? '商品不存在或已被删除' : error?.message || '商品信息加载失败')
+    router.push({ name: 'item-list' })
+  } finally {
+    loadingItem.value = false
+  }
+}
+loadForEdit()
+
+// 400 参数校验失败：把后端 fieldErrors 逐字段回填到表单项（request.js 已弹第一条提示）
+function applyFieldErrors(fieldErrors) {
+  if (!fieldErrors || typeof fieldErrors !== 'object') return
+  formRef.value?.fields?.forEach((field) => {
+    const message = fieldErrors[field.prop]
+    if (message) {
+      field.validateMessage = message
+      field.validateState = 'error'
+    }
+  })
+}
+
 async function handleSubmit() {
   if (!formRef.value) return
 
@@ -73,9 +102,32 @@ async function handleSubmit() {
     return
   }
 
-  // TODO(M3/M4): 在这里调用 createItem / updateItem，本阶段不提交、不 mock 数据
-  submitting.value = false
-  ElMessage.info(isEdit.value ? '保存功能将在 M4 阶段接入' : '发布功能将在 M3 阶段接入')
+  submitting.value = true
+  // 字符串 trim 后提交（与后端校验口径一致）
+  const payload = {
+    item: form.item.trim(),
+    itemPrice: form.itemPrice,
+    contactInfo: form.contactInfo.trim(),
+  }
+  try {
+    const saved = isEdit.value
+      ? await updateItem(route.params.id, payload)
+      : await createItem(payload)
+    ElMessage.success(isEdit.value ? '商品已保存' : '商品发布成功')
+    router.push({ name: 'item-detail', params: { id: saved.id } })
+  } catch (error) {
+    if (error?.code === 10001) {
+      applyFieldErrors(error.data?.fieldErrors)
+    } else if (error?.code === 10005) {
+      ElMessage.error('商品不存在或已被删除')
+      router.push({ name: 'item-list' })
+    } else if (error?.code === 10004) {
+      // 403 提示已由 request.js 统一弹出，退出编辑回列表
+      router.push({ name: 'item-list' })
+    }
+  } finally {
+    submitting.value = false
+  }
 }
 
 function handleCancel() {
@@ -84,14 +136,7 @@ function handleCancel() {
 </script>
 
 <template>
-  <section class="page page--narrow">
-    <el-alert
-      class="form-tip"
-      type="info"
-      :closable="false"
-      title="该页面为 M2 骨架：编辑回填与提交保存将在 M3/M4 阶段完成"
-    />
-
+  <section v-loading="loadingItem" class="page page--narrow">
     <div class="page__head">
       <h1 class="page__title">{{ pageTitle }}</h1>
       <p v-if="isEdit" class="page__subtitle">商品 ID：{{ route.params.id }}</p>
