@@ -149,6 +149,26 @@ mysql -u<user> -p --default-character-set=utf8mb4 < sql\data.sql
 
 实机验证（2026-10-23 通过，MySQL 8.4.11）：`schema.sql` + `data.sql` 连续执行两次均成功，重复执行后 users=2、items=5；表 2 张（InnoDB / utf8mb4_0900_ai_ci）；索引 user=PRIMARY+uk_user_username、item=PRIMARY+idx_item_user_id+idx_item_created_at+idx_item_price；重复用户名（含大小写变体）、价格 0/超上限、非法角色、非法外键均被拒绝，合法插入/删除正常。
 
+### 7.1 M5 最终校验记录（M5-C，交付前最终验证）
+
+验证环境：MySQL 8.0.46（C 本机），日期：2026-10-24。流程：`DROP DATABASE campus_secondhand` → 按 README 命令重放 `schema.sql` → `data.sql` → 校验 → 二次执行 `data.sql` 验幂等。全部通过：
+
+| 校验项 | 结果 | 判定 |
+|---|---|---|
+| 表清单 | `item`、`user` 共 2 张 | ✅ |
+| 索引 | user=PRIMARY+uk_user_username（2）；item=PRIMARY+idx_item_user_id+idx_item_created_at+idx_item_price（4） | ✅ |
+| 引擎/字符集 | 均 InnoDB / utf8mb4_0900_ai_ci | ✅ |
+| 种子计数 | users=2、items=5 | ✅ |
+| 演示账号 | admin(ADMIN)/student(USER)，哈希前缀均为 `$2b$10$`（BCrypt cost 10） | ✅ |
+| CHECK 约束 | chk_item_price_range、chk_user_role 均已定义 | ✅ |
+| 重复用户名 `STUDENT`（大小写变体） | ERROR 1062（uk_user_username）拒绝 | ✅ |
+| 价格 =0 / =1000000 | ERROR 3819（chk_item_price_range）拒绝 | ✅ |
+| 非法角色 `ROOT` | ERROR 3819（chk_user_role）拒绝 | ✅ |
+| 非法外键 user_id=999 | ERROR 1452（fk_item_user）拒绝 | ✅ |
+| `data.sql` 二次执行 | 仍 users=2、items=5，幂等 | ✅ |
+
+**结论：SQL 脚本最终校验通过，干净环境按 README 可完整初始化，可重复执行。**
+
 ## 8. 测试数据（`sql/data.sql`，仅本地测试，生产禁用）
 
 | 账号 | 角色 | user.id | 测试口令 | password_hash |
@@ -158,6 +178,19 @@ mysql -u<user> -p --default-character-set=utf8mb4 < sql\data.sql
 
 - BCrypt cost 10（`$2b$` 前缀，Spring Security `BCryptPasswordEncoder` 支持）；D 实现登录时用 `matches("123456", hash)` 复核；生产禁用。
 - 商品：id 1–5，全部归属 student（user_id=2），价格 280.00 / 25.50 / 39.90 / 89.00 / 15.00，用于验证默认列表与价格排序。
+
+### 8.1 演示数据说明（M5-C，演示场景对照）
+
+| 演示场景 | 使用数据 | 说明 |
+|---|---|---|
+| 登录 / 登出 / 获取当前用户 | admin、student（口令 `123456`） | 覆盖 USER 与 ADMIN 两种角色 |
+| 商品列表（默认排序） | 商品 id 1–5 | created_at 递减插入，默认 `created_at DESC, id DESC` 即 id 5→1 |
+| 价格升序 / 降序 | 价格 15.00～280.00 互不相同 | 升序首条为「考研英语真题」，降序首条为「二手自行车」 |
+| 名称模糊搜索 | 名称含「教材」「耳机」等常见词 | 搜索「书」命中 0 条（演示空态），搜「英语」「耳机」各命中 1 条 |
+| 权限演示（改 / 删） | 商品全部归属 student | student 可改删全部 5 条；admin 演示管理员放行；如需演示 403，用 admin 之外的第二个 USER 注册新账号后操作他人商品 |
+| 联系方式展示 | 微信/QQ/电话三种格式 | 覆盖 `contact_info` 常见写法 |
+
+> 演示前重置：`DROP DATABASE campus_secondhand;` 后按 §7（README）重放两脚本即可回到上述状态。
 
 ## 9. 与 API 契约一致性
 - 字段按 §5 映射，与 api-spec v1.1 核对一致；`password` 只入不出，响应无密码字段；未发现与 architecture/requirements 冲突。
@@ -171,3 +204,4 @@ mysql -u<user> -p --default-character-set=utf8mb4 < sql\data.sql
 2026-10-23：v1.0-draft（C，详细版）→ v1.1 精简版（C，按课程定位压缩文档与脚本注释，表结构/口径不变）；A 已确认按当前方案执行；SQL 于 2026-10-23 实机验证通过（MySQL 8.4.11）。
 2026-10-23：追加 §6.1 EXPLAIN 实机验证记录（C4，C 于本机 MySQL 8.0.46 完成；含 10005 行压测与"混合方向排序不走索引"的取舍说明）。
 2026-10-24：追加 §6.2 Mapper SQL 评审记录（C5 / M4-C1，C 评审 D 写操作 PR #2 的 ItemMapper.xml，结论通过；含 2 条非阻塞提醒）；追加 §6.3 写操作实机验证记录（M4-C2，干净库重放后手工验证发布/修改/删除，通过并恢复种子）。
+2026-10-24：追加 §7.1 M5 最终校验记录与 §8.1 演示数据说明（M5-C，C 于本机 MySQL 8.0.46 完成 DROP 重建 + 重放 + 约束抽查 + 幂等验证，全部通过）。
