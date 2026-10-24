@@ -120,7 +120,7 @@ class ItemWriteControllerTest {
     @DisplayName("修改：无权限返回 403/10004")
     void should_return403_when_updateForbidden() throws Exception {
         when(itemService.updateItem(eq(10L), any(ItemSaveRequest.class), eq(3L), eq(Constants.ROLE_USER)))
-                .thenThrow(new BusinessException(ErrorCode.FORBIDDEN, "只能操作自己发布的商品"));
+                .thenThrow(new BusinessException(ErrorCode.FORBIDDEN));
 
         mockMvc.perform(put("/api/items/10")
                         .session(loginSession(3L, Constants.ROLE_USER))
@@ -128,14 +128,14 @@ class ItemWriteControllerTest {
                         .content(validBody()))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value(10004))
-                .andExpect(jsonPath("$.message").value("只能操作自己发布的商品"));
+                .andExpect(jsonPath("$.message").value("无权限执行该操作"));
     }
 
     @Test
     @DisplayName("修改：商品不存在返回 404/10005")
     void should_return404_when_updateMissing() throws Exception {
         when(itemService.updateItem(eq(999L), any(ItemSaveRequest.class), eq(2L), eq(Constants.ROLE_USER)))
-                .thenThrow(new BusinessException(ErrorCode.NOT_FOUND, "商品不存在"));
+                .thenThrow(new BusinessException(ErrorCode.NOT_FOUND));
 
         mockMvc.perform(put("/api/items/999")
                         .session(loginSession(2L, Constants.ROLE_USER))

@@ -87,7 +87,7 @@ public class ItemServiceImpl implements ItemService {
         }
         Item item = itemMapper.selectById(id);
         if (item == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND, "商品不存在");
+            throw new BusinessException(ErrorCode.NOT_FOUND);
         }
         return toItemVO(item);
     }
@@ -116,7 +116,7 @@ public class ItemServiceImpl implements ItemService {
         // 不更新 user_id 与 created_at；updated_at 由 SQL 的 CURRENT_TIMESTAMP 刷新
         int updated = itemMapper.update(existing);
         if (updated == 0) {
-            throw new BusinessException(ErrorCode.NOT_FOUND, "商品不存在");
+            throw new BusinessException(ErrorCode.NOT_FOUND);
         }
         log.info("商品修改成功: id={}, operatorId={}", id, currentUserId);
         return toItemVO(itemMapper.selectById(id));
@@ -128,7 +128,7 @@ public class ItemServiceImpl implements ItemService {
         loadAndCheckPermission(id, currentUserId, currentRole);
         int deleted = itemMapper.deleteById(id);
         if (deleted == 0) {
-            throw new BusinessException(ErrorCode.NOT_FOUND, "商品不存在");
+            throw new BusinessException(ErrorCode.NOT_FOUND);
         }
         log.info("商品删除成功: id={}, operatorId={}", id, currentUserId);
     }
@@ -143,11 +143,11 @@ public class ItemServiceImpl implements ItemService {
         }
         Item item = itemMapper.selectById(id);
         if (item == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND, "商品不存在");
+            throw new BusinessException(ErrorCode.NOT_FOUND);
         }
         boolean isAdmin = Constants.ROLE_ADMIN.equals(currentRole);
         if (!isAdmin && !item.getUserId().equals(currentUserId)) {
-            throw new BusinessException(ErrorCode.FORBIDDEN, "只能操作自己发布的商品");
+            throw new BusinessException(ErrorCode.FORBIDDEN);
         }
         return item;
     }

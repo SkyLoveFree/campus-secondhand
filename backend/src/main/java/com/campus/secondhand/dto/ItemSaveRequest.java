@@ -10,7 +10,7 @@ import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 
 /**
- * 商品发布/修改请求体（M3/M4 使用，本期仅骨架）。
+ * 商品发布/修改请求体。
  *
  * <p>校验口径与 docs/api-spec.md 一致：item、contactInfo trim 后 1-100 字符；
  * itemPrice &gt; 0 且 ≤ 999999.99，最多两位小数。归属 userId 只取 Session，请求中忽略该字段。</p>

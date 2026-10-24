@@ -213,7 +213,7 @@ class ItemServiceImplTest {
     }
 
     @Test
-    @DisplayName("详情：商品不存在 → 404/10005「商品不存在」")
+    @DisplayName("详情：商品不存在 → 404/10005「商品不存在或已删除」")
     void getItem_should_throwNotFound_when_itemMissing() {
         when(itemMapper.selectById(999999L)).thenReturn(null);
 
@@ -221,7 +221,7 @@ class ItemServiceImplTest {
 
         assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.NOT_FOUND);
         assertThat(ex.getErrorCode().getCode()).isEqualTo(10005);
-        assertThat(ex.getMessage()).isEqualTo("商品不存在");
+        assertThat(ex.getMessage()).isEqualTo("商品不存在或已删除");
     }
 
     @Test

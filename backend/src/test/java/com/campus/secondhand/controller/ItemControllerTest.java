@@ -190,15 +190,15 @@ class ItemControllerTest {
     }
 
     @Test
-    @DisplayName("详情不存在：404/10005「商品不存在」")
+    @DisplayName("详情不存在：404/10005「商品不存在或已删除」")
     void should_returnNotFound_when_itemMissing() throws Exception {
         when(itemService.getItem(999999L))
-                .thenThrow(new BusinessException(ErrorCode.NOT_FOUND, "商品不存在"));
+                .thenThrow(new BusinessException(ErrorCode.NOT_FOUND));
 
         mockMvc.perform(get("/api/items/999999"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value(10005))
-                .andExpect(jsonPath("$.message").value("商品不存在"))
+                .andExpect(jsonPath("$.message").value("商品不存在或已删除"))
                 .andExpect(jsonPath("$.data").value((Object) null));
     }
 

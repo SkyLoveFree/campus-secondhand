@@ -19,10 +19,10 @@ public enum ErrorCode {
     LOGIN_FAILED(10003, HttpStatus.UNAUTHORIZED, "用户名或密码错误"),
 
     /** 已登录但无操作权限 */
-    FORBIDDEN(10004, HttpStatus.FORBIDDEN, "无权限"),
+    FORBIDDEN(10004, HttpStatus.FORBIDDEN, "无权限执行该操作"),
 
     /** 资源不存在或已删除 */
-    NOT_FOUND(10005, HttpStatus.NOT_FOUND, "资源不存在"),
+    NOT_FOUND(10005, HttpStatus.NOT_FOUND, "商品不存在或已删除"),
 
     /** 用户名已存在（含并发唯一键冲突） */
     USERNAME_EXISTS(10006, HttpStatus.CONFLICT, "用户名已存在"),
@@ -31,10 +31,10 @@ public enum ErrorCode {
     REQUEST_FORMAT_ERROR(10007, HttpStatus.BAD_REQUEST, "请求格式错误"),
 
     /** 请求方法不支持 */
-    METHOD_NOT_ALLOWED(10008, HttpStatus.METHOD_NOT_ALLOWED, "方法不支持"),
+    METHOD_NOT_ALLOWED(10008, HttpStatus.METHOD_NOT_ALLOWED, "请求方法不支持"),
 
     /** 未预期异常：只记录日志，响应不返回堆栈 */
-    INTERNAL_ERROR(10500, HttpStatus.INTERNAL_SERVER_ERROR, "服务器错误");
+    INTERNAL_ERROR(10500, HttpStatus.INTERNAL_SERVER_ERROR, "服务器内部错误，请稍后重试");
 
     private final int code;
     private final HttpStatus httpStatus;
