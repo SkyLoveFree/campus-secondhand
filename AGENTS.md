@@ -1,7 +1,7 @@
 # 校园二手交易系统 — AGENTS.md
 
 > 项目：JavaWeb 课程期末大作业（4 人小组，前端 Vue + 后端 Spring Boot + MySQL）。本文件是规则入口，细节见 `docs/`。
-> 阶段：M4（写入与权限）——按 `docs/team-assignments.md` §9 的分工开发；未分配任务不得改动。
+> 阶段：M4 收尾 / M5 交付准备——按 `docs/team-assignments.md` §9 的分工执行；未分配任务不得改动。
 > 标记：✅ 已确认 ｜ 🟡 建议方案（按此执行，有异议先找 A）｜ ⏳ 待确认。最后更新：2026-10-23（v1.1 精简版）。
 
 ## 1. 项目简介与目标
@@ -147,5 +147,5 @@ campus-secondhand/
 | `sql/schema.sql`、`sql/data.sql` | 建表与测试数据脚本 |
 | `README.md` | 环境、启动、部署（M2/M5 阶段补） |
 
-- 当前：M4 进行中（2026-10-24）。M1/M2/M3 已完成；D 写接口已合并验收；B 表单/删除、C Mapper 评审、D 文案修复待完成（分工见 [team-assignments.md](docs/team-assignments.md) §9）；下一步 M4 全量回归 → M5 交付。
+- 当前：M4 收尾 / M5 准备（2026-10-24）。B/C 的 M4 任务已验收；D 的文案修复需重做（P-18/P-19）；M5 单 Jar 部署冒烟已通过（见 [design-review.md](docs/design-review.md) §7.2/§7.3）；下一步 D 修复合并 → 最终回归 → tag/ZIP。
 - 文档冲突时：需求看 requirements、接口看 api-spec、表结构看 database-design/schema.sql、流程看 development-workflow；仍冲突先停下问 A。

@@ -122,4 +122,4 @@ java -jar $jar.FullName
 
 ## 当前阶段
 
-M4（2026-10-24）：D 商品发布/修改/删除接口已合并并通过验收（23/23 E2E）；M4 剩余任务（B 表单/删除、C Mapper 评审、D 文案修复）见 [`docs/team-assignments.md`](docs/team-assignments.md) §9；下一步 M4 全量回归 → M5 交付。
+M4 收尾 / M5 准备（2026-10-24）：B 表单/删除/README、C Mapper 评审与写操作验证已合并并验收；D 的错误文案修复（PR #7 无实际改动）待重做；M5 单 Jar 部署冒烟已通过。D 修复合并后做最终全量回归、打 tag `v1.0`、生成交付 ZIP。
