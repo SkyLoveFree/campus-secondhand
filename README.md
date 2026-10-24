@@ -164,6 +164,14 @@ java -jar $jar.FullName
 - [需求规格](docs/requirements.md) · [系统架构](docs/architecture.md) · [API 规范](docs/api-spec.md) · [数据库设计](docs/database-design.md)
 - [设计评审与验收](docs/design-review.md) · [分工计划](docs/team-assignments.md) · [开发流程](docs/development-workflow.md)
 
+## 部署
+
+- 本地开发/单 Jar 启动见上文；一键脚本见 [`start.ps1`](start.ps1) 与 [`一键启动.bat`](一键启动.bat)。
+- 远程服务器已部署：**http://120.76.241.77:8080**（Ubuntu 24.04 + MySQL 8.0.46，systemd 托管，开机自启）。
+- 远程控制脚本与更新说明见 [`deploy/README.md`](deploy/README.md)：
+  - [`deploy/远程启动.bat`](deploy/远程启动.bat) / [`deploy/远程停止.bat`](deploy/远程停止.bat)
+  - [`deploy/远程状态.bat`](deploy/远程状态.bat) / [`deploy/远程卸载.bat`](deploy/远程卸载.bat)
+
 ## 接口文档
 
 - 完整契约：[`docs/api-spec.md`](docs/api-spec.md)（9 个接口、错误码、示例）
