@@ -110,6 +110,25 @@ java -jar $jar.FullName
 
 浏览器访问 `http://localhost:8080`：前端页面与 `/api` 同域，刷新不会 404（前端使用 hash 路由）。
 
+### 5.4 一键启动（Windows，推荐）
+
+双击项目根目录的 `一键启动.bat`，或在 PowerShell 执行：
+
+```powershell
+.\start.ps1              # 已有 Jar 时直接启动
+.\start.ps1 -Rebuild     # 修改代码后重新构建前端 + 后端
+.\start.ps1 -Port 8080   # 指定端口
+```
+
+脚本会自动检查 Java、端口、Jar、数据库连接，设置环境变量后启动，并在 8 秒后打开浏览器。首次运行会询问 MySQL 用户名/密码；也可以提前设置 `DB_USERNAME`/`DB_PASSWORD`，或在根目录创建 `.env.local`（已被 `.gitignore` 忽略）：
+
+```text
+DB_USERNAME=root
+DB_PASSWORD=你的密码
+```
+
+停止：按 `Ctrl+C`，或双击 `停止服务.bat`（等价于 `.\stop.ps1`）。
+
 ## 6. 功能使用说明
 
 ### 6.1 游客

@@ -43,6 +43,35 @@ cmd /c "mysql -u root -p --default-character-set=utf8mb4 < sql\data.sql"
 
 脚本会创建数据库 `campus_secondhand` 并重建 `user`、`item` 两张表；`data.sql` 可重复执行（先删后插）。
 
+## 一键启动（Windows）
+
+**双击根目录的 [`一键启动.bat`](一键启动.bat)**，或在 PowerShell 中执行：
+
+```powershell
+.\start.ps1              # 直接启动（已有 Jar）
+.\start.ps1 -Rebuild     # 修改代码后重新构建前端 + 后端
+.\start.ps1 -Port 8080   # 指定端口
+```
+
+脚本会自动：
+
+1. 检查 Java 与端口，若已有正常实例则直接打开浏览器；
+2. 找到 `backend\target` 下的 Jar，没有则提示/构建；
+3. 检查数据库连接（首次可引导执行 `sql/schema.sql` + `sql/data.sql`）；
+4. 设置 `DB_USERNAME` / `DB_PASSWORD` 后启动，并在 8 秒后自动打开浏览器。
+
+首次运行会询问 MySQL 用户名/密码；可以：
+
+- 提前设置环境变量 `DB_USERNAME`、`DB_PASSWORD`；
+- 或在根目录新建 `.env.local`（已被 `.gitignore` 忽略）：
+  ```text
+  DB_USERNAME=root
+  DB_PASSWORD=你的密码
+  ```
+
+停止服务：按 `Ctrl+C`，或双击 [`停止服务.bat`](停止服务.bat)（等价于 `.\stop.ps1`）。
+
+
 **测试账号（仅本地演示环境）**
 
 | 账号 | 密码 | 角色 |
