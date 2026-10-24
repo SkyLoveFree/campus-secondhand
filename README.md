@@ -75,6 +75,17 @@ npm run dev
 
 前端默认 `http://localhost:5173`，开发期 `/api` 由 Vite 代理到后端 8080（Cookie 同源）。前端路由使用 hash 模式。
 
+前端目录结构（`frontend/src/`）：
+
+| 目录/文件 | 职责 |
+|---|---|
+| `api/` | 接口封装（`auth.js` / `item.js`），页面唯一调用入口，不直接拼后端 URL |
+| `utils/request.js` | axios 实例：`baseURL '/api'`、`withCredentials`；统一错误处理（401 跳登录、400 透出 `fieldErrors`、403 统一提示） |
+| `stores/user.js` | Pinia 登录态；`canManage` 仅控制按钮显隐，权限由后端强制校验 |
+| `router/` | hash 模式路由 + 登录守卫（启动时经 `/api/auth/me` 恢复登录态） |
+| `views/` | Login / Register / ItemList / ItemDetail / ItemForm（发布与编辑共用，400 `fieldErrors` 逐字段回填） |
+| `components/` | AppHeader / ItemCard |
+
 ## 构建与部署（单 Jar 同域）
 
 ```powershell
