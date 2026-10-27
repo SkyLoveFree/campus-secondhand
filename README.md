@@ -161,6 +161,7 @@ java -jar $jar.FullName
 
 - [使用手册](docs/user-manual.md)：环境、初始化、启动、功能操作、常见问题、演示检查清单
 - [答辩讲解与问答](docs/presentation-and-qa.md)：12～15 分钟讲解稿、现场演示脚本、43 个常见问题参考答案
+- [源码位置与分工说明](docs/code-map-and-ownership.md)：给老师看代码时的文件定位、功能→代码映射、每人负责模块
 - [需求规格](docs/requirements.md) · [系统架构](docs/architecture.md) · [API 规范](docs/api-spec.md) · [数据库设计](docs/database-design.md)
 - [设计评审与验收](docs/design-review.md) · [分工计划](docs/team-assignments.md) · [开发流程](docs/development-workflow.md)
 
